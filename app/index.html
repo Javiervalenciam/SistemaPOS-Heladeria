@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heladería Tropical - Sistema POS</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Lato:wght@300;400;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Toastify -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <!-- App Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<button id="hamburger-btn" class="hamburger-btn" aria-label="Abrir menú" aria-expanded="false">
+    <svg class="hamburger-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    <svg class="close-icon hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+</button>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2>🍦 Heladería Tropical</h2>
+            </div>
+            <ul class="sidebar-menu" id="sidebar-menu">
+                <li><a href="#dashboard" class="nav-link active" data-section="dashboard">📊 Dashboard</a></li>
+                <li><a href="#inventory" class="nav-link" data-section="inventory">📦 Inventario</a></li>
+                <li><a href="#sales" class="nav-link" data-section="sales">🧾 Facturación</a></li>
+                <li><a href="#invoice-history" class="nav-link" data-section="invoice-history">📋 Historial de Facturas</a></li>
+                <li><a href="#reports" class="nav-link" data-section="reports">📈 Reportes</a></li>
+                <li><a href="#settings" class="nav-link" data-section="settings">⚙️ Configuración</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="section active" aria-labelledby="dashboard-title">
+                <div class="section-header">
+                    <div class="section-title-container"></div>
+                    <h1 id="dashboard-title">Dashboard</h1>
+                    <p>Resumen de actividad de hoy</p>
+                </div>
+
+                <div class="dashboard-stats">
+                    <div class="stat-card" aria-label="Ventas del día">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-info">
+                            <h3 id="daily-sales">$0</h3>
+                            <p>Ventas del día</p>
+                        </div>
+                    </div>
+                    <div class="stat-card" aria-label="Facturas hoy">
+                        <div class="stat-icon">📝</div>
+                        <div class="stat-info">
+                            <h3 id="daily-invoices">0</h3>
+                            <p>Facturas hoy</p>
+                        </div>
+                    </div>
+                    <div class="stat-card" aria-label="Productos en inventario">
+                        <div class="stat-icon">📦</div>
+                        <div class="stat-info">
+                            <h3 id="total-products">0</h3>
+                            <p>Productos en inventario</p>
+                        </div>
+                    </div>
+                    <div class="stat-card" aria-label="Stock bajo">
+                        <div class="stat-icon">⚠️</div>
+                        <div class="stat-info">
+                            <h3 id="low-stock">0</h3>
+                            <p>Stock bajo</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-content">
+                    <div class="recent-sales" aria-label="Últimas ventas">
+                        <h3>Últimas Ventas</h3>
+                        <div id="recent-sales-list" class="sales-list"></div>
+                    </div>
+
+                    <div class="low-stock-alert" aria-label="Productos con stock bajo">
+                        <h3>Productos con Stock Bajo</h3>
+                        <div id="low-stock-list" class="stock-list"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Inventory Section -->
+            <section id="inventory" class="section" aria-labelledby="inventory-title">
+                <div class="section-header">
+                    <div class="section-title-container"></div>
+                    <h1 id="inventory-title">Gestión de Inventario</h1>
+                    <button class="btn btn--primary" id="add-product-btn" type="button">➕ Agregar Producto</button>
+                </div>
+
+                <div class="inventory-controls">
+                    <div class="search-container">
+                        <input type="text" id="product-search" class="form-control" placeholder="Buscar por código o nombre..." aria-label="Buscar producto">
+                    </div>
+                    <div class="filter-container">
+                        <select id="category-filter" class="form-control" aria-label="Filtrar por categoría">
+                            <option value="">Todas las categorías</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="inventory-grid" id="inventory-grid" aria-live="polite"></div>
+            </section>
+
+            <!-- Sales Section -->
+            <section id="sales" class="section" aria-labelledby="sales-title">
+                <div class="section-header">
+                    <div class="section-title-container"></div>
+                    <h1 id="sales-title">Facturación</h1>
+                    <button class="btn btn--primary" id="new-invoice-btn" type="button">🧾 Nueva Factura</button>
+                </div>
+
+                <div class="sales-content">
+                    <div class="current-invoice" aria-label="Factura actual">
+                        <h3>Factura Actual</h3>
+                        <div id="current-invoice-items" class="invoice-items"></div>
+                        <div class="invoice-summary">
+                            <div class="summary-line">
+                                <span>Subtotal:</span>
+                                <span id="invoice-subtotal">$0</span>
+                            </div>
+                            <div class="summary-line">
+                                <span>IVA (<span id="tax-rate-label">0</span>%):</span>
+                                <span id="invoice-tax">$0</span>
+                            </div>
+                            <div class="summary-line total">
+                                <span>Total:</span>
+                                <span id="invoice-total">$0</span>
+                            </div>
+                        </div>
+                        <div class="payment-calculator">
+                            <div class="form-group">
+                                <label for="payment-amount">Pago recibido:</label>
+                                <input type="number" id="payment-amount" class="form-control" placeholder="0" min="0" step="100" aria-describedby="change-amount">
+                            </div>
+                            <div class="change-amount">
+                                <span>Cambio:</span>
+                                <span id="change-amount">$0</span>
+                            </div>
+                            <button class="btn btn--primary btn--full-width" id="complete-sale-btn" type="button">Completar Venta</button>
+                        </div>
+                    </div>
+
+                    <div class="product-selector" aria-label="Selector de productos">
+                        <h3>Seleccionar Productos</h3>
+                        <div class="product-search">
+                            <input type="text" id="sales-product-search" class="form-control" placeholder="Buscar producto por código..." aria-label="Buscar producto para venta">
+                        </div>
+                        <div class="product-grid" id="sales-product-grid"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Invoice History Section -->
+            <section id="invoice-history" class="section" aria-labelledby="invoice-history-title">
+                <div class="section-header">
+                    <div class="section-title-container"></div>
+                    <h1 id="invoice-history-title">Historial de Facturas</h1>
+                    <div class="invoice-stats">
+                        <span id="total-invoices-count">0 facturas</span>
+                    </div>
+                </div>
+
+                <div class="invoice-history-content">
+                    <div class="invoice-filters">
+                        <input type="date" id="date-filter" class="form-control" placeholder="Filtrar por fecha">
+                        <input type="text" id="invoice-search" class="form-control" placeholder="Buscar por número de factura...">
+                    </div>
+                    <div class="invoice-history-grid" id="invoice-history-grid"></div>
+                    <div class="pagination-controls" id="pagination-controls">
+                        <button class="btn btn--secondary" id="prev-page">← Anterior</button>
+                        <span id="page-info">Página 1 de 1</span>
+                        <button class="btn btn--secondary" id="next-page">Siguiente →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reports Section -->
+            <section id="reports" class="section" aria-labelledby="reports-title">
+                <div class="section-header">
+                    <div class="section-title-container"></div>
+                    <h1 id="reports-title">Reportes</h1>
+                </div>
+
+                <div class="reports-grid">
+                    <div class="report-card" aria-label="Ventas por día">
+                        <h3>Ventas Últimos 7 Días</h3>
+                        <div class="chart-container">
+                            <canvas id="daily-sales-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="report-card" aria-label="Productos más vendidos">
+                        <h3>Top 5 Productos</h3>
+                        <div class="chart-container">
+                            <canvas id="top-products-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="report-card" aria-label="Análisis de rentabilidad">
+                        <h3>Análisis de Rentabilidad</h3>
+                        <div id="profitability-analysis" class="profitability-analysis"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings" class="section" aria-labelledby="settings-title">
+                <div class="section-header">
+                    <div class="section-title-container"></div>
+                    <h1 id="settings-title">Configuración</h1>
+                </div>
+
+                <div class="settings-content">
+                    <div class="settings-card" aria-label="Información de la empresa">
+                        <h3>Información de la Empresa</h3>
+                        <div class="form-group">
+                            <label for="company-name">Nombre de la empresa:</label>
+                            <input type="text" id="company-name" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="company-address">Dirección:</label>
+                            <input type="text" id="company-address" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="company-phone">Teléfono:</label>
+                            <input type="tel" id="company-phone" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="company-email">Email:</label>
+                            <input type="email" id="company-email" class="form-control">
+                        </div>
+                        <button class="btn btn--primary" id="save-company-info" type="button">Guardar Información</button>
+                    </div>
+
+                    <div class="settings-card" aria-label="Configuración de impuestos">
+                        <h3>Configuración de Impuestos</h3>
+                        <div class="form-group">
+                            <label for="tax-rate">Porcentaje de IVA:</label>
+                            <input type="number" id="tax-rate" class="form-control" min="0" max="100" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label for="stock-minimum">Stock mínimo de alerta:</label>
+                            <input type="number" id="stock-minimum" class="form-control" min="0" step="1">
+                        </div>
+                        <button class="btn btn--primary" id="save-tax-settings" type="button">Guardar Configuración</button>
+                    </div>
+
+                    <div class="settings-card" aria-label="Respaldo de datos">
+                        <h3>Respaldo de Datos</h3>
+                        <div class="backup-actions">
+                            <button class="btn btn--secondary" id="export-data" type="button">📥 Exportar Datos</button>
+                            <button class="btn btn--secondary" id="import-data" type="button">📤 Importar Datos</button>
+                            <input type="file" id="import-file" accept=".json" style="display: none;">
+                        </div>
+                        <div class="backup-reminder" id="backup-reminder">
+                            <p>Último respaldo: <span id="last-backup-date">Nunca</span></p>
+                        </div>
+                        <button class="btn btn--outline" id="clear-data" type="button">🗑️ Limpiar Todos los Datos</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal for Adding/Editing Products -->
+    <div id="product-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="product-modal-title">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="product-modal-title">Agregar Producto</h2>
+                <button class="modal-close" id="product-modal-close" type="button" aria-label="Cerrar">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="product-form">
+                    <div class="form-group">
+                        <label for="product-code">Código del producto:</label>
+                        <input type="text" id="product-code" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-name">Nombre del producto:</label>
+                        <input type="text" id="product-name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-category">Categoría:</label>
+                        <select id="product-category" class="form-control" required>
+                            <option value="">Seleccionar categoría</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-price">Precio:</label>
+                        <input type="number" id="product-price" class="form-control" min="0" step="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-stock">Stock inicial:</label>
+                        <input type="number" id="product-stock" class="form-control" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-description">Descripción:</label>
+                        <textarea id="product-description" class="form-control" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn--secondary" id="product-modal-cancel" type="button">Cancelar</button>
+                <button class="btn btn--primary" id="product-modal-save" type="button">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Viewing Invoice -->
+    <div id="invoice-view-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="invoice-view-modal-title">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="invoice-view-modal-title">Factura</h2>
+                <button class="modal-close" id="invoice-view-modal-close" type="button" aria-label="Cerrar">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="invoice-view-content" class="invoice-printable">
+                    <!-- Invoice content will be inserted here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn--secondary" id="invoice-print-btn" type="button">🖨️ Imprimir</button>
+                <button class="btn btn--primary" id="invoice-view-close" type="button">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay" role="status" aria-live="polite">
+        <div class="loading-spinner"></div>
+        <p>Cargando...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/dexie@3.2.4/dist/dexie.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

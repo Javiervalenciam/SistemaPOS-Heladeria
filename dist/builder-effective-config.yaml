@@ -1,0 +1,9 @@
+directories:
+  output: dist
+  buildResources: build
+appId: com.tuempresa.mipos
+productName: Heladeria Tropical POS
+win:
+  target: portable
+files: []
+electronVersion: 29.4.6
